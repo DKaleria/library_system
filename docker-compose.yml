@@ -1,0 +1,87 @@
+services:
+  db:
+    container_name: library-management-postgres
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: my_user
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: library_management_db
+    ports:
+      - "5434:5432"
+  identity_db:
+    container_name: identity_db
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: my_user
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: identity_db
+    ports:
+      - "5433:5432"
+
+  redis:
+    image: redis
+    container_name: library-management-redis
+    restart: always
+    volumes:
+      - redis_volume_data:/data
+    ports:
+      - "6380:6379"
+
+  book-service:
+    image: dockerfile-bookservice:0.0.1
+    ports:
+      - "8083:8083"
+    depends_on:
+      - db
+      - redis
+      - discoveryservice
+      - identity-service
+
+  book-order-service:
+    image: dockerfile-orderservice:0.0.1
+    ports:
+      - "8084:8084"
+    depends_on:
+      - db
+      - discoveryservice
+      - identity-service
+
+  auth_user-service:
+    image: dockerfile-auth_user:0.0.1
+    ports:
+      - "8085:8085"
+    depends_on:
+      - db
+      - discoveryservice
+      - identity-service
+
+  discoveryservice:
+    image: dockerfile-discoveryservice:0.0.1
+    ports:
+      - "8761:8761"
+    environment:
+      SPRING_APPLICATION_NAME: discoveryservice
+      SERVER_PORT: 8761
+      EUREKA_INSTANCE_HOSTNAME: discoveryservice
+      EUREKA_CLIENT_REGISTER_WITH_EUREKA: "false"
+
+  api-gateway:
+    image: dockerfile-apigateway:0.0.1
+    ports:
+      - "8082:8082"
+    depends_on:
+      - discoveryservice
+      - identity-service
+
+  identity-service:
+    image: dockerfile-identity:0.0.1
+    ports:
+      - "8088:8088"
+    depends_on:
+      - identity_db
+      - discoveryservice
+
+volumes:
+  redis_volume_data:
