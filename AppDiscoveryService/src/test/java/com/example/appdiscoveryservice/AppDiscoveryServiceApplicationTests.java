@@ -1,4 +1,4 @@
-package com.example.bookorderservice.appdiscoveryservice;
+package com.example.appdiscoveryservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
