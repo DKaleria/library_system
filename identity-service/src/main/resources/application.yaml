@@ -1,6 +1,6 @@
 spring:
   application:
-    name: IdentityService
+    name: identity-service
   profiles:
     active: database
   datasource:

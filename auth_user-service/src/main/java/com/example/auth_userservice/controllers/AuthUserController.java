@@ -11,8 +11,11 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/auth_users")
 public class AuthUserController {
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public AuthUserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/users")
     public ResponseEntity<List<User>> searchUsers(@RequestHeader("Authorization") String authHeader) {
