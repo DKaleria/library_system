@@ -13,4 +13,6 @@ public interface BookOrderService {
     BookOrderModel updateOrder(Long orderId, BookOrderUpdateRequest updateRequest);
 
     void deleteOrder(Long orderId);
+
+    void checkIfBookExists(Long bookId);
 }

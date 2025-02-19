@@ -48,6 +48,12 @@ public class BookServiceImpl implements BookService {
         return bookMapper.toModels(bookRepository.findAll(specification));
     }
 
+    public BookModel getBookById(Long bookId){
+        BookEntity bookEntity = bookRepository.findById(bookId).orElseThrow(
+                () -> new RuntimeException(format("Книга с ID %d не существует", bookId)));
+        return bookMapper.toModel(bookEntity);
+    }
+
     @Override
     public BookModel addBook(BookModel model) {
         AuthorEntity author = new AuthorEntity(

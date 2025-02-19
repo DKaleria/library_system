@@ -10,7 +10,12 @@ import com.example.bookorderservice.repository.entity.BookOrderEntity;
 import com.example.bookorderservice.service.BookOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+import reactor.core.publisher.Mono;
+
 import java.util.List;
+
 import static java.lang.String.format;
 
 @Service
@@ -19,6 +24,7 @@ public class BookOrderServiceImpl implements BookOrderService {
 
     private final BookOrderRepository bookOrderRepository;
     private final BookOrderMapper bookOrderMapper;
+    private final WebClient.Builder webClientBuilder;
 
     @Override
     public List<BookOrderModel> getAllOrders() {
@@ -27,6 +33,8 @@ public class BookOrderServiceImpl implements BookOrderService {
 
     @Override
     public BookOrderModel createOrder(BookOrderCreateRequest createRequest) {
+        checkIfBookExists(createRequest.bookId());
+
         BookOrderEntity bookOrderEntity = BookOrderEntity.builder()
                 .userId(createRequest.userId())
                 .bookId(createRequest.bookId())
@@ -34,6 +42,7 @@ public class BookOrderServiceImpl implements BookOrderService {
                 .quantity(createRequest.quantity())
                 .orderDate(createRequest.orderDate())
                 .build();
+
         bookOrderEntity = bookOrderRepository.save(bookOrderEntity);
         return bookOrderMapper.toModel(bookOrderEntity);
     }
@@ -56,5 +65,22 @@ public class BookOrderServiceImpl implements BookOrderService {
     @Override
     public void deleteOrder(Long orderId) {
         bookOrderRepository.deleteById(orderId);
+    }
+
+    public void checkIfBookExists(Long bookId) {
+        try {
+            webClientBuilder.build().get()
+                    .uri("http://localhost:8083/books/{book_id}", bookId)
+                    .retrieve()
+                    .onStatus(status -> status.is4xxClientError() || status.is5xxServerError(),
+                            response -> Mono.error(
+                                    new RuntimeException("Ошибка при получении книги: "
+                                            + response.statusCode())))
+                    .bodyToMono(Void.class)
+                    .block();
+
+        } catch (WebClientResponseException e) {
+            throw new RuntimeException("Книга не найдена: " + e.getMessage());
+        }
     }
 }
