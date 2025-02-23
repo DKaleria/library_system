@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   db:
     container_name: library-management-postgres
@@ -9,6 +11,7 @@ services:
       POSTGRES_DB: library_management_db
     ports:
       - "5434:5432"
+
   identity_db:
     container_name: identity_db
     image: postgres
@@ -38,6 +41,7 @@ services:
       - redis
       - discoveryservice
       - identity-service
+      - shared-service
 
   book-order-service:
     image: dockerfile-orderservice:0.0.1
@@ -47,6 +51,7 @@ services:
       - db
       - discoveryservice
       - identity-service
+      - shared-service
 
   auth_user-service:
     image: dockerfile-auth_user:0.0.1
@@ -56,6 +61,7 @@ services:
       - db
       - discoveryservice
       - identity-service
+      - shared-service
 
   discoveryservice:
     image: dockerfile-discoveryservice:0.0.1
@@ -74,12 +80,22 @@ services:
     depends_on:
       - discoveryservice
       - identity-service
+      - shared-service
 
   identity-service:
     image: dockerfile-identity:0.0.1
     ports:
       - "8088:8088"
     depends_on:
+      - identity_db
+      - discoveryservice
+
+  shared-service:
+    image: dockerfile-shared:0.0.1
+    ports:
+      - "8086:8086"
+    depends_on:
+      - db
       - identity_db
       - discoveryservice
 

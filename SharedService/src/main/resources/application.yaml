@@ -1,4 +1,10 @@
 spring:
   application:
     name: SharedService
- 
+  cloud:
+    discovery:
+      client:
+        serviceUrl:
+          defaultZone: http://discoveryservice:8761/eureka/
+  server:
+    port: 8086
