@@ -21,3 +21,14 @@ eureka:
       defaultZone: http://discoveryservice:8761/eureka
   instance:
     instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      BookService:
+        automatic-transition-from-open-to-half-open-enabled: true
+        minimumNumberOfCalls: 3
+        failureRateThreshold: 50
+        slidingWindowSize: 10
+        sliding-window-type: COUNT_BASED
+        permittedNumberOfCallsInHalfOpenState: 2

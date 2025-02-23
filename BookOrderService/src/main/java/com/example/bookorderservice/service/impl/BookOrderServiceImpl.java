@@ -8,6 +8,7 @@ import com.example.bookorderservice.model.BookOrderModel;
 import com.example.bookorderservice.repository.BookOrderRepository;
 import com.example.bookorderservice.repository.entity.BookOrderEntity;
 import com.example.bookorderservice.service.BookOrderService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -67,6 +68,7 @@ public class BookOrderServiceImpl implements BookOrderService {
         bookOrderRepository.deleteById(orderId);
     }
 
+    @CircuitBreaker(name = "BookService")
     public void checkIfBookExists(Long bookId) {
         try {
             webClientBuilder.build().get()
