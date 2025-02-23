@@ -17,15 +17,10 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(unique = true, nullable = false)
     private String username;
-
     private LocalDate birthDate;
-
     private String firstname;
-
     private String lastname;
-
     private String password;
 }

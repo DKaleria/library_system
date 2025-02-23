@@ -6,8 +6,10 @@ import com.example.identityservice.database.entity.User;
 import com.example.identityservice.database.repository.UserRepository;
 import com.example.identityservice.service.UserService;
 import com.example.identityservice.usecaseses.mapper.AuthUserMapper;
+import com.example.sharedservice.event.AuthUserGotEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,7 +28,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthUserMapper authUserMapper;
-// private KafkaTemplate<String, AuthUserGotEvent> kafkaTemplate;
+    private KafkaTemplate<String, AuthUserGotEvent> kafkaTemplate;
 
     public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthUserMapper authUserMapper) {
         this.userRepository = userRepository;
@@ -46,7 +48,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 .lastname(request.getLastname())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
-        return userRepository.save(user);
+
+        User savedUser = userRepository.save(user);
+
+        AuthUserGotEvent event = authUserMapper.userToAuthUserGotEvent(savedUser);
+        kafkaTemplate.send("auth-user-topic", event);
+
+        return savedUser;
     }
 
     @Override

@@ -114,6 +114,11 @@
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-openfeign-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.example.sharedservice</groupId>
+			<artifactId>SharedService</artifactId>
+			<version>0.0.1</version>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>

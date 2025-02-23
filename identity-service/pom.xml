@@ -95,7 +95,11 @@
             <version>1.6.0</version>
             <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.example.sharedservice</groupId>
+            <artifactId>SharedService</artifactId>
+            <version>0.0.1</version>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>

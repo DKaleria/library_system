@@ -1,6 +1,5 @@
 package com.example.identityservice.controller;
 
-//import com.example.demo.events.AuthUserGotEvent;
 import com.example.identityservice.database.entity.AuthenticationRequest;
 import com.example.identityservice.database.entity.AuthenticationResponse;
 import com.example.identityservice.database.entity.RegistrationRequest;
@@ -38,6 +37,7 @@ public class AuthController {
         User user = userService.register(request);
         return ResponseEntity.ok(user);
     }
+
     @GetMapping("/users")
     @Transactional(readOnly = true)
     public ResponseEntity<List<User>> getAllUsers() {
