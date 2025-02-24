@@ -47,9 +47,12 @@ services:
     image: dockerfile-orderservice:0.0.1
     ports:
       - "8084:8084"
+    environment:
+      - GRPC_AUTH_USER_SERVICE=auth_user_service:9090
     depends_on:
       - db
       - discoveryservice
+      - auth_user-service
       - identity-service
       - shared-service
 
@@ -57,6 +60,7 @@ services:
     image: dockerfile-auth_user:0.0.1
     ports:
       - "8085:8085"
+      - "9090:9090"
     depends_on:
       - db
       - discoveryservice

@@ -1,5 +1,6 @@
 package com.example.bookorderservice.service.impl;
 
+import com.example.bookorderservice.AuthUserServiceGrpc;
 import com.example.bookorderservice.controller.request.BookOrderCreateRequest;
 import com.example.bookorderservice.controller.request.BookOrderUpdateRequest;
 import com.example.bookorderservice.enums.BookOrderStatus;
@@ -17,6 +18,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import reactor.core.publisher.Mono;
 import java.util.List;
 import static java.lang.String.format;
+import net.devh.boot.grpc.client.inject.GrpcClient;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +39,7 @@ public class BookOrderServiceImpl implements BookOrderService {
     @Override
     public BookOrderModel createOrder(BookOrderCreateRequest createRequest) {
         checkIfBookExists(createRequest.bookId());
+        checkIfUserExists(createRequest.userId());
 
         BookOrderEntity bookOrderEntity = BookOrderEntity.builder()
                 .userId(createRequest.userId())
@@ -90,7 +93,7 @@ public class BookOrderServiceImpl implements BookOrderService {
 
 
     public void checkIfUserExists(Long userId) {
-        CheckUserRequest request = CheckUserRequest.newBuilder().setUserId(userId).build();
+        AuthUser.CheckUserRequest request = CheckUserRequest.newBuilder().setUserId(userId).build();
         CheckUserResponse response;
 
         try {

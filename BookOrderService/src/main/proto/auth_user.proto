@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package com.example.bookorderservice;
 
-service BookOrderService{
+service AuthUserService{
   rpc CheckUserExists (CheckUserRequest) returns (CheckUserResponse);
 }
 
