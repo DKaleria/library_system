@@ -1,7 +1,6 @@
 package com.example.auth_userservice.service.impl;
 
 import com.example.auth_userservice.AuthUser;
-import com.example.auth_userservice.AuthUserServiceGrpc;
 import com.example.auth_userservice.config.IdentityServiceClient;
 import com.example.auth_userservice.database.entity.User;
 import com.example.auth_userservice.database.repository.UserRepository;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
+import com.example.auth_userservice.AuthUserServiceGrpc;
 
 @Service
 @GrpcService

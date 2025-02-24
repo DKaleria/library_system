@@ -9,14 +9,13 @@ import com.example.bookorderservice.repository.BookOrderRepository;
 import com.example.bookorderservice.repository.entity.BookOrderEntity;
 import com.example.bookorderservice.service.BookOrderService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.grpc.StatusRuntimeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
-
 import java.util.List;
-
 import static java.lang.String.format;
 
 @Service
@@ -26,6 +25,9 @@ public class BookOrderServiceImpl implements BookOrderService {
     private final BookOrderRepository bookOrderRepository;
     private final BookOrderMapper bookOrderMapper;
     private final WebClient.Builder webClientBuilder;
+
+    @GrpcClient("authUserService")
+    private final AuthUserServiceGrpc.AuthUserServiceBlockingStub userServiceStub;
 
     @Override
     public List<BookOrderModel> getAllOrders() {
@@ -83,6 +85,21 @@ public class BookOrderServiceImpl implements BookOrderService {
 
         } catch (WebClientResponseException e) {
             throw new RuntimeException("Книга не найдена: " + e.getMessage());
+        }
+    }
+
+
+    public void checkIfUserExists(Long userId) {
+        CheckUserRequest request = CheckUserRequest.newBuilder().setUserId(userId).build();
+        CheckUserResponse response;
+
+        try {
+            response = userServiceStub.checkUserExists(request);
+            if (!response.getExists()) {
+                throw new RuntimeException("Пользователь не найден");
+            }
+        } catch (StatusRuntimeException e) {
+            throw new RuntimeException("Ошибка при обращении к AuthUserService: " + e.getStatus().getDescription());
         }
     }
 }
